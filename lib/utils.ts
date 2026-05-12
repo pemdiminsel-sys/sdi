@@ -107,7 +107,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
 }
 
 // Export ke CSV
-export function exportToCsv(data: Record<string, unknown>[], filename: string): void {
+export function exportToCsv(data: any[], filename: string): void {
   if (data.length === 0) return;
   const headers = Object.keys(data[0]);
   const rows = data.map((row) =>

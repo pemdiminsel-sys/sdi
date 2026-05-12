@@ -12,9 +12,9 @@ import {
   ShieldCheck,
   Server
 } from "lucide-react";
-import { StatCard } from "@/components/ui/StatCard";
 import { DashboardSkeleton } from "@/components/ui/Skeleton";
 import ReactECharts from "echarts-for-react";
+import { cn } from "@/lib/utils";
 
 async function fetchAdminStats() {
   const res = await fetch("/api/v1/statistik");

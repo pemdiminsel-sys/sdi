@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Zap, Github, Mail, Globe } from "lucide-react";
+import { Zap } from "lucide-react";
 import { APP_CONFIG } from "@/lib/constants";
 
 export default function Footer() {

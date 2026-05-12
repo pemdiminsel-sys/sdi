@@ -72,4 +72,3 @@ export async function GET(request: NextRequest) {
     return Response.json({ success: false, error: error.message }, { status: 500 });
   }
 }
-}

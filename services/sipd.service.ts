@@ -77,8 +77,8 @@ function generateFallbackData(): DssdRecord[] {
 async function fetchWithRetry(
   url: string,
   options: RequestInit = {},
-  retries = SIPD_API.retryCount,
-  delay = SIPD_API.retryDelay
+  retries: number = SIPD_API.retryCount,
+  delay: number = SIPD_API.retryDelay
 ): Promise<Response> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), SIPD_API.timeout);
