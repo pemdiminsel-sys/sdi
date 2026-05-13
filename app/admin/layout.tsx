@@ -25,8 +25,19 @@ const sidebarItems = [
   { icon: Settings, label: "Settings", href: "/admin/settings" },
 ];
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    const isAuth = document.cookie.includes("sdi-admin-session=true");
+    if (!isAuth) {
+      router.push("/login");
+    }
+  }, [router]);
 
   return (
     <div className="flex h-screen bg-[#070e1c] text-slate-200 overflow-hidden">

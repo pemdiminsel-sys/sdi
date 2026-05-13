@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import DashboardSidebar from "@/components/layout/DashboardSidebar";
 
 export default function DashboardLayout({
@@ -5,6 +9,15 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+
+  useEffect(() => {
+    const isAuth = document.cookie.includes("sdi-admin-session=true");
+    if (!isAuth) {
+      router.push("/login");
+    }
+  }, [router]);
+
   return (
     <div className="flex min-h-screen bg-[#07111e]">
       <DashboardSidebar />
