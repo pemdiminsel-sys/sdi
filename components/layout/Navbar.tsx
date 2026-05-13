@@ -17,6 +17,7 @@ const navItems = [
   { href: "/maps", label: "Peta", icon: Map },
   { href: "/infografis", label: "Infografis", icon: BarChart3 },
   { href: "/api-docs", label: "API", icon: FileText },
+  { href: "/ranking-fb-minsel.html", label: "Ranking FB", icon: Globe },
 ];
 
 export default function Navbar() {

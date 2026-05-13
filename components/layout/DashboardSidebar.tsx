@@ -16,6 +16,7 @@ const sidebarLinks = [
   { href: "/dashboard/opd", label: "Data OPD", icon: Building },
   { href: "/dashboard/users", label: "Pengguna", icon: Users },
   { href: "/dashboard/settings", label: "Pengaturan", icon: Settings },
+  { href: "/ranking-fb-minsel.html", label: "Ranking FB", icon: Activity },
 ];
 
 export default function DashboardSidebar() {
