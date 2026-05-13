@@ -14,9 +14,10 @@ import {
   FileSpreadsheet,
   CheckCircle2
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, exportToCsv } from "@/lib/utils";
 import type { Dataset } from "@/types";
 import { KATEGORI_DATASET } from "@/lib/constants";
+import { toast } from "sonner";
 
 async function fetchAllDatasets() {
   const res = await fetch("/api/v1/datasets?per_page=100");
@@ -42,6 +43,15 @@ export default function AdminDatasetsPage() {
     return matchesSearch && matchesCategory;
   });
 
+  const handleBulkExport = () => {
+    if (filteredDatasets.length === 0) {
+      toast.error("Tidak ada data untuk diekspor");
+      return;
+    }
+    exportToCsv(filteredDatasets, `sdi-minsel-export-${new Date().toISOString().split('T')[0]}`);
+    toast.success(`${filteredDatasets.length} dataset berhasil diekspor ke CSV`);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -50,7 +60,10 @@ export default function AdminDatasetsPage() {
           <p className="text-sm text-slate-400 mt-1">Manage visibility and metadata of all integrated datasets</p>
         </div>
         <div className="flex gap-2">
-          <button className="btn-secondary text-xs">
+          <button 
+            onClick={handleBulkExport}
+            className="btn-secondary text-xs"
+          >
             <FileSpreadsheet size={14} className="mr-2" />
             Bulk Export
           </button>

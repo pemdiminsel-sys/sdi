@@ -10,6 +10,8 @@ import {
   CheckCircle2,
   Lock
 } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 const MOCK_USERS = [
@@ -20,14 +22,74 @@ const MOCK_USERS = [
 ];
 
 export default function UsersPage() {
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleAddUser = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setShowAddForm(false);
+      toast.success("User baru berhasil ditambahkan (Simulasi)");
+    }, 1500);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Add User Modal Placeholder */}
+      {showAddForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="glass-card w-full max-w-md p-8 border-white/10 animate-in zoom-in-95 duration-200">
+            <h2 className="text-xl font-bold text-white mb-6">Register New User</h2>
+            <form onSubmit={handleAddUser} className="space-y-4">
+              <div>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">Full Name</label>
+                <input type="text" className="input-field" placeholder="John Doe" required />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">Email Address</label>
+                <input type="email" className="input-field" placeholder="user@minsel.go.id" required />
+              </div>
+              <div>
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">Account Role</label>
+                <select className="input-field text-sm">
+                  <option>Super Admin</option>
+                  <option>Walidata</option>
+                  <option>Admin OPD</option>
+                  <option>Viewer</option>
+                </select>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button 
+                  type="button" 
+                  onClick={() => setShowAddForm(false)}
+                  className="flex-1 btn-secondary py-2"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="flex-1 btn-primary py-2 justify-center"
+                >
+                  {isSubmitting ? "Processing..." : "Create Account"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">User Accounts</h1>
           <p className="text-sm text-slate-400 mt-1">Manage platform access for government agencies and walidata</p>
         </div>
-        <button className="btn-primary">
+        <button 
+          onClick={() => setShowAddForm(true)}
+          className="btn-primary"
+        >
           <UserPlus size={16} className="mr-2" />
           Add New User
         </button>

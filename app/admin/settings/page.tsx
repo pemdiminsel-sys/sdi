@@ -12,7 +12,8 @@ import {
   Key,
   Server,
   Mail,
-  BellRing
+  BellRing,
+  Edit3
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -32,6 +33,7 @@ export default function SettingsPage() {
   const tabs = [
     { id: "api", icon: Server, label: "API Configuration" },
     { id: "general", icon: Globe, label: "General Settings" },
+    { id: "cms", icon: Database, label: "Static Content (CMS)" },
     { id: "security", icon: Shield, label: "Security & Auth" },
     { id: "notifications", icon: BellRing, label: "Notifications" },
     { id: "email", icon: Mail, label: "Email SMTP" },
@@ -176,6 +178,53 @@ export default function SettingsPage() {
                 <div>
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">Portal Subtitle</label>
                   <input type="text" defaultValue="Transparansi Data untuk Pembangunan berkelanjutan" className="input-field" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "cms" && (
+            <div className="space-y-6">
+              <div className="glass-card p-6 space-y-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Edit3 size={18} className="text-red-400" />
+                  <h2 className="text-lg font-bold text-white">Tentang SDI (About)</h2>
+                </div>
+                <textarea 
+                  rows={6}
+                  className="input-field text-sm py-3"
+                  placeholder="Tuliskan deskripsi tentang Portal Satu Data Indonesia Minahasa Selatan di sini..."
+                  defaultValue="Satu Data Indonesia adalah kebijakan tata kelola Data pemerintah untuk menghasilkan Data yang akurat, mutakhir, terpadu, dan dapat dipertanggungjawabkan, serta mudah diakses dan dibagipakaikan antar Instansi Pusat dan Instansi Daerah..."
+                />
+              </div>
+
+              <div className="glass-card p-6 space-y-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield size={18} className="text-blue-400" />
+                  <h2 className="text-lg font-bold text-white">Kebijakan Data (Privacy & Policy)</h2>
+                </div>
+                <textarea 
+                  rows={6}
+                  className="input-field text-sm py-3"
+                  placeholder="Tuliskan kebijakan penggunaan data..."
+                  defaultValue="Seluruh data yang dipublikasikan di portal ini mengikuti standar Satu Data Indonesia. Pengguna diperbolehkan menggunakan data untuk keperluan analisis dengan mencantumkan sumber..."
+                />
+              </div>
+
+              <div className="glass-card p-6 space-y-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <Mail size={18} className="text-green-400" />
+                  <h2 className="text-lg font-bold text-white">Informasi Kontak</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">Alamat Kantor</label>
+                    <input type="text" defaultValue="Kantor Bupati Minahasa Selatan, Amurang" className="input-field" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">Email Support</label>
+                    <input type="email" defaultValue="diskominfo@minsel.go.id" className="input-field" />
+                  </div>
                 </div>
               </div>
             </div>
