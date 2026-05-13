@@ -23,13 +23,22 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handler, { passive: true });
+    
+    // Check if user is admin (client-side)
+    setIsAdmin(document.cookie.includes("sdi-admin-session=true"));
+    
     return () => window.removeEventListener("scroll", handler);
   }, []);
+
+  const filteredNavItems = isAdmin 
+    ? navItems 
+    : navItems.filter(item => item.href !== "/dashboard");
 
   return (
     <>
@@ -57,7 +66,7 @@ export default function Navbar() {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
-            {navItems.map(({ href, label, icon: Icon }) => (
+            {filteredNavItems.map(({ href, label, icon: Icon }) => (
               <Link
                 key={href}
                 href={href}
@@ -93,13 +102,15 @@ export default function Navbar() {
                 style={{ background: "#C41E3A" }}
               />
             </button>
-            <Link
-              href="/dashboard"
-              className="btn-primary hidden sm:inline-flex text-xs py-1.5 px-3"
-            >
-              <LayoutDashboard size={13} />
-              Dashboard
-            </Link>
+            {isAdmin && (
+              <Link
+                href="/dashboard"
+                className="btn-primary hidden sm:inline-flex text-xs py-1.5 px-3"
+              >
+                <LayoutDashboard size={13} />
+                Dashboard
+              </Link>
+            )}
             {/* Mobile toggle */}
             <button
               className="md:hidden p-2 rounded-lg text-slate-400 hover:text-white"

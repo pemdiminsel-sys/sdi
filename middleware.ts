@@ -26,10 +26,11 @@ export async function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Config to only run middleware on specific paths
 export const config = {
   matcher: [
+    "/admin",
     "/admin/:path*",
+    "/dashboard",
     "/dashboard/:path*",
     "/api/v1/sync/:path*",
     "/api/v1/admin/:path*",

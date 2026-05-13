@@ -108,11 +108,13 @@ export default function HeroSection({ summary }: HeroProps) {
           className="flex flex-col sm:flex-row gap-4 animate-fade-up delay-400"
           style={{ animationFillMode: "both" }}
         >
-          <Link href="/dashboard" className="btn-primary text-base py-3 px-8">
-            <LayoutDashboard size={18} />
-            Buka Dashboard
-            <ChevronRight size={16} />
-          </Link>
+          {document.cookie.includes("sdi-admin-session=true") && (
+            <Link href="/dashboard" className="btn-primary text-base py-3 px-8">
+              <LayoutDashboard size={18} />
+              Buka Dashboard
+              <ChevronRight size={16} />
+            </Link>
+          )}
           <Link href="/datasets" className="btn-secondary text-base py-3 px-8">
             <Database size={18} />
             Jelajahi Dataset
