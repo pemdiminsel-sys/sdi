@@ -33,11 +33,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
 
   useEffect(() => {
-    const isAuth = document.cookie.includes("sdi-admin-session=true");
-    if (!isAuth) {
+    // Explicitly check for the presence and value of the cookie
+    const cookies = document.cookie.split(";").map(c => c.trim());
+    const hasSession = cookies.some(c => c === "sdi-admin-session=true");
+    
+    if (!hasSession) {
+      console.log("[AdminGuard] No active session found, redirecting to login");
       router.push("/login");
     }
   }, [router]);
+
+  const handleLogout = async () => {
+    // Clear cookie
+    document.cookie = "sdi-admin-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    
+    // Sign out from Supabase if used
+    const { supabase } = await import("@/lib/supabase");
+    await supabase.auth.signOut();
+    
+    // Redirect
+    window.location.href = "/";
+  };
 
   return (
     <div className="flex h-screen bg-[#070e1c] text-slate-200 overflow-hidden">
@@ -75,7 +91,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
 
-        <div className="p-4 mt-auto border-t border-white/5">
+        <div className="p-4 mt-auto border-t border-white/5 space-y-2">
           <div className="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/5">
             <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center border border-white/10">
               <User size={18} className="text-slate-400" />
@@ -85,6 +101,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <div className="text-[10px] text-slate-500 truncate">admin@minsel.go.id</div>
             </div>
           </div>
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-900/10 border border-red-900/20 text-red-500 hover:bg-red-900/20 transition-all text-xs font-bold uppercase tracking-wider"
+          >
+            <LogOut size={14} />
+            Keluar Sesi
+          </button>
         </div>
       </aside>
 

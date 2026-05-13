@@ -20,7 +20,27 @@ const sidebarLinks = [
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    // Explicitly check for the presence and value of the cookie
+    const cookies = document.cookie.split(";").map(c => c.trim());
+    const hasSession = cookies.some(c => c === "sdi-admin-session=true");
+    
+    if (!hasSession && !pathname.includes("/login")) {
+      router.push("/login");
+    }
+  }, [router, pathname]);
+
+  const handleLogout = async () => {
+    // Clear cookie
+    document.cookie = "sdi-admin-session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    
+    const { supabase } = await import("@/lib/supabase");
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  };
 
   return (
     <aside
@@ -83,11 +103,7 @@ export default function DashboardSidebar() {
         </div>
         {!collapsed ? (
           <button 
-            onClick={async () => {
-              const { supabase } = await import("@/lib/supabase");
-              await supabase.auth.signOut();
-              window.location.href = "/";
-            }}
+            onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-sm font-medium transition-colors"
           >
             <LogOut size={16} />
@@ -95,11 +111,7 @@ export default function DashboardSidebar() {
           </button>
         ) : (
           <button 
-            onClick={async () => {
-              const { supabase } = await import("@/lib/supabase");
-              await supabase.auth.signOut();
-              window.location.href = "/";
-            }}
+            onClick={handleLogout}
             className="w-full flex items-center justify-center p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 transition-colors" 
             title="Keluar"
           >
