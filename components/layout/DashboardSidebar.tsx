@@ -77,17 +77,32 @@ export default function DashboardSidebar() {
           {!collapsed && (
             <div className="flex-1">
               <div className="text-sm font-semibold text-white">Super Admin</div>
-              <div className="text-xs text-slate-400">Bappeda Minsel</div>
+              <div className="text-xs text-slate-400">Bapelitbangda Minsel</div>
             </div>
           )}
         </div>
         {!collapsed ? (
-          <button className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-sm font-medium transition-colors">
+          <button 
+            onClick={async () => {
+              const { supabase } = await import("@/lib/supabase");
+              await supabase.auth.signOut();
+              window.location.href = "/";
+            }}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-sm font-medium transition-colors"
+          >
             <LogOut size={16} />
             Keluar
           </button>
         ) : (
-          <button className="w-full flex items-center justify-center p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 transition-colors" title="Keluar">
+          <button 
+            onClick={async () => {
+              const { supabase } = await import("@/lib/supabase");
+              await supabase.auth.signOut();
+              window.location.href = "/";
+            }}
+            className="w-full flex items-center justify-center p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 transition-colors" 
+            title="Keluar"
+          >
             <LogOut size={16} />
           </button>
         )}

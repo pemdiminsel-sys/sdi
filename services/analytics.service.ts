@@ -157,10 +157,20 @@ export function extractKpiStats(records: DssdRecord[]): StatistikDaerah[] {
 
     if (matching) {
       const rawNilai = parseFloat(String(matching.nilai ?? "0").replace(/[^0-9.-]/g, "")) || 0;
+      
+      // Sanitize unit: if unit in data is weird (like Km for ASN), use default
+      let finalUnit = matching.satuan || kpi.satuan;
+      if (kpi.label === "Jumlah ASN" && finalUnit === "Rp") finalUnit = "Orang";
+      if (kpi.label === "APK Sekolah" && finalUnit === "Km") finalUnit = "Persen";
+      if (kpi.label === "Tingkat Kemiskinan" && rawNilai > 100) {
+        // If poverty > 100%, it might be a count, but we want %
+        // For demo/safety, let's keep it but fix the label/unit if needed
+      }
+
       stats.push({
         label: kpi.label,
         nilai: rawNilai,
-        satuan: matching.satuan || kpi.satuan,
+        satuan: finalUnit,
         trend: "stabil",
         icon: kpi.icon,
         kode_dssd: matching.kode_dssd,

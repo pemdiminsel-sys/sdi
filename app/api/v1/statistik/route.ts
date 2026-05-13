@@ -12,7 +12,8 @@ export const revalidate = 1800;
 
 export async function GET(_request: NextRequest) {
   try {
-    const records = await sipdService.getDssd();
+    // Ambil data dari database (hasil sinkronisasi)
+    const records = await sipdService.getDatasetsFromDb();
     const summary = await sipdService.getSummaryStats(records);
     const kpis = extractKpiStats(records);
     const insights = generateInsights(records);

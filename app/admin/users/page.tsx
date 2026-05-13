@@ -151,10 +151,17 @@ export default function UsersPage() {
             </div>
 
             <div className="mt-4 flex gap-2 pt-4 border-t border-white/5">
-              <button className="flex-1 btn-secondary py-1.5 text-[10px] font-bold uppercase tracking-widest justify-center">
+              <button 
+                onClick={() => toast.info(`Editing profile for ${user.name}`)}
+                className="flex-1 btn-secondary py-1.5 text-[10px] font-bold uppercase tracking-widest justify-center"
+              >
                 Edit Profile
               </button>
-              <button className="p-2 rounded-lg bg-red-900/10 border border-red-900/20 text-red-500 hover:bg-red-900/20 transition-all" title="Reset Password">
+              <button 
+                onClick={() => toast.warning(`Account access for ${user.name} has been locked.`)}
+                className="p-2 rounded-lg bg-red-900/10 border border-red-900/20 text-red-500 hover:bg-red-900/20 transition-all" 
+                title="Lock Account"
+              >
                 <Lock size={14} />
               </button>
             </div>

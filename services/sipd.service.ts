@@ -31,36 +31,57 @@ function generateFallbackData(): DssdRecord[] {
   const kategoriList = [...KATEGORI_DATASET].filter((k) => k !== "Lainnya");
   const kecamatanList = [...KECAMATAN_MINSEL];
 
-  // Generate ~250 realistic demo records
+  const indikatorConfig: Record<string, Array<{ name: string; unit: string; min: number; max: number }>> = {
+    Kependudukan: [
+      { name: "Jumlah Penduduk", unit: "Jiwa", min: 230000, max: 245000 },
+      { name: "Kepadatan Penduduk", unit: "Jiwa/Km2", min: 150, max: 200 },
+      { name: "Jumlah KK", unit: "KK", min: 70000, max: 85000 }
+    ],
+    Pendidikan: [
+      { name: "APK SD", unit: "Persen", min: 95, max: 99 },
+      { name: "APK Sekolah", unit: "Persen", min: 85, max: 95 },
+      { name: "Angka Melek Huruf", unit: "Persen", min: 98, max: 99 }
+    ],
+    Kesehatan: [
+      { name: "Prevalensi Stunting", unit: "Persen", min: 14, max: 22 },
+      { name: "Cakupan Imunisasi", unit: "Persen", min: 90, max: 96 }
+    ],
+    Kemiskinan: [
+      { name: "Tingkat Kemiskinan", unit: "Persen", min: 7.5, max: 10.2 },
+      { name: "Jumlah KPM PKH", unit: "Keluarga", min: 12000, max: 15000 }
+    ],
+    Infrastruktur: [
+      { name: "Panjang Jalan", unit: "Km", min: 800, max: 1200 },
+      { name: "Kondisi Jalan Baik", unit: "Persen", min: 60, max: 75 }
+    ],
+    Ekonomi: [
+      { name: "PDRB per Kapita", unit: "Juta Rp", min: 45, max: 55 },
+      { name: "Tingkat Pengangguran", unit: "Persen", min: 3, max: 5 }
+    ],
+    Pemerintahan: [
+      { name: "Jumlah ASN", unit: "Orang", min: 4200, max: 4500 },
+      { name: "Nilai SAKIP", unit: "Poin", min: 65, max: 75 }
+    ]
+  };
+
   let idxGlobal = 1;
   for (const opd of opdNames) {
-    const numRecords = Math.floor(Math.random() * 20) + 8;
+    const numRecords = Math.floor(Math.random() * 15) + 5;
     for (let i = 0; i < numRecords; i++) {
       const kat = kategoriList[Math.floor(Math.random() * kategoriList.length)];
       const kec = kecamatanList[Math.floor(Math.random() * kecamatanList.length)];
+      const configs = indikatorConfig[kat] || [{ name: "Data Indikator", unit: "Unit", min: 10, max: 100 }];
+      const config = configs[Math.floor(Math.random() * configs.length)];
+      
       const kode = `DS${String(idxGlobal).padStart(4, "0")}`;
-      const indikatorNames: Record<string, string[]> = {
-        Kependudukan: ["Jumlah Penduduk", "Kepadatan Penduduk", "Jumlah KK", "Laju Pertumbuhan Penduduk", "Jumlah Kelahiran"],
-        Pendidikan: ["APK SD", "APM SMP", "Angka Melek Huruf", "Jumlah Sekolah", "Jumlah Guru"],
-        Kesehatan: ["Prevalensi Stunting", "Cakupan Imunisasi", "Jumlah Puskesmas", "AKI", "AKB"],
-        Kemiskinan: ["Angka Kemiskinan", "Jumlah KPM PKH", "Penerima BPNT", "Indeks Keparahan Kemiskinan"],
-        Infrastruktur: ["Panjang Jalan", "Kondisi Jalan Baik", "Akses Air Bersih", "Sanitasi Layak"],
-        Ekonomi: ["PDRB per Kapita", "Tingkat Pengangguran", "Jumlah UMKM", "PAD"],
-        Pertanian: ["Produksi Padi", "Luas Lahan Sawah", "Produktivitas Padi", "Nilai Tukar Petani"],
-        Pemerintahan: ["Jumlah ASN", "Nilai SAKIP", "Indeks Inovasi Daerah"],
-        Lingkungan: ["Luas RTH", "Penanganan Sampah", "Indeks Kualitas Lingkungan"],
-        Sosial: ["Jumlah Disabilitas", "Cakupan Jamkesda", "Angka KDRT"],
-      };
-      const names = indikatorNames[kat] ?? ["Data Indikator"];
-      const namaDs = names[Math.floor(Math.random() * names.length)];
-
+      
       records.push({
         id: String(idxGlobal),
         kode_dssd: kode,
-        nama_dssd: namaDs,
-        satuan: ["Jiwa", "Persen", "Unit", "Km", "Rp", "Ha", "Ton"][Math.floor(Math.random() * 7)],
+        nama_dssd: config.name,
+        satuan: config.unit,
         tahun: 2023 + Math.floor(Math.random() * 2),
-        nilai: parseFloat((Math.random() * 10000).toFixed(2)),
+        nilai: parseFloat((Math.random() * (config.max - config.min) + config.min).toFixed(2)),
         nama_opd: opd,
         kecamatan_kode: kec.kode,
         kecamatan_nama: kec.nama,
