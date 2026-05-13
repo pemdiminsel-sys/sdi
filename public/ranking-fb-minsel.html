@@ -132,11 +132,8 @@
         <tbody id="tableBody"></tbody>
       </table>
     </div>
-    <div class="action-bar">
-      <button class="btn btn-success" disabled style="opacity: 0.5; cursor: not-allowed;">🔒 Simpan Data Terkunci</button>
-      <button class="btn btn-outline" onclick="exportCSV()">📥 Export CSV</button>
-      <span id="saveMsg" style="font-size:12px; color:green; margin-left:8px;"></span>
-      <span style="margin-left:auto; font-size:12px; color:#888;" id="filledCount">0 / 46 diisi</span>
+    <div class="action-bar" id="action-bar-ui">
+      <!-- UI will be rendered by JS -->
     </div>
   </div>
 
@@ -241,6 +238,19 @@ const DATA = [
 let userData = {};
 let rankChartInst = null;
 let catChartInst = null;
+let isLocked = true;
+
+function checkLock() {
+  const pass = document.getElementById('unlockPass')?.value;
+  if (pass === 'Testing123') {
+    isLocked = false;
+    alert('✅ Akses pengeditan dibuka!');
+    renderTable();
+    renderActionBar();
+  } else {
+    alert('❌ Password salah!');
+  }
+}
 
 function loadData() {
   try {
@@ -324,14 +334,16 @@ function renderTable() {
     if (status === 'filled' && !hasData) return;
     if (status === 'empty' && hasData) return;
 
+    const isDisabled = isLocked ? 'disabled' : '';
+
     rows += `<tr>
       <td class="no">${r.no}</td>
       <td class="nama">${r.nama}<br><span style="font-size:11px; color:#aaa;">${r.cat}</span></td>
       <td><span class="category-badge">${r.cat}</span></td>
       <td class="link"><a href="${r.url}" target="_blank">🔗 Buka FB</a></td>
-      <td><input class="num-input" type="number" disabled value="${d.followers||''}"></td>
+      <td><input class="num-input" type="number" ${isDisabled} min="0" placeholder="..." value="${d.followers||''}" onchange="setField(${r.no},'followers',this.value)"></td>
       <td>
-        <select class="freq-select" disabled>
+        <select class="freq-select" ${isDisabled} onchange="setField(${r.no},'freq',this.value)">
           <option value="">— pilih —</option>
           <option value="0" ${d.freq=='0'?'selected':''}>Tidak posting</option>
           <option value="0.25" ${d.freq=='0.25'?'selected':''}>1x/bulan</option>
@@ -343,7 +355,7 @@ function renderTable() {
           <option value="7" ${d.freq=='7'?'selected':''}>Setiap hari</option>
         </select>
       </td>
-      <td><input class="date-input" type="date" disabled value="${d.lastPost||''}"></td>
+      <td><input class="date-input" type="date" ${isDisabled} value="${d.lastPost||''}" onchange="setField(${r.no},'lastPost',this.value)"></td>
       <td>
         ${hasData
           ? `<span class="score-badge" style="background:${st.bg}; color:${st.text};">${total}</span><br><span style="font-size:10px; color:${st.text};">${st.label}</span>`
@@ -354,7 +366,32 @@ function renderTable() {
   });
 
   tbody.innerHTML = rows || '<tr><td colspan="8" class="no-data">Tidak ada data yang cocok dengan filter</td></tr>';
-  document.getElementById('filledCount').textContent = `${filledCount} / 46 diisi`;
+  renderActionBar(filledCount);
+}
+
+function renderActionBar(filledCount) {
+  const bar = document.getElementById('action-bar-ui');
+  if (isLocked) {
+    bar.innerHTML = `
+      <div style="display:flex; align-items:center; gap:10px; width:100%;">
+        <div style="display:flex; align-items:center; gap:6px; background:#fff; border:1px solid #ddd; padding:4px 10px; border-radius:8px;">
+          <span style="font-size:12px; color:#666;">🔑 Password:</span>
+          <input type="password" id="unlockPass" style="border:none; outline:none; width:100px; font-size:13px;" placeholder="••••••">
+          <button class="btn btn-primary" style="padding:4px 12px; font-size:11px;" onclick="checkLock()">Buka Kunci</button>
+        </div>
+        <button class="btn btn-outline" onclick="exportCSV()">📥 Export CSV</button>
+        <span style="margin-left:auto; font-size:12px; color:#888;">${filledCount || 0} / 46 diisi (Mode Read-Only)</span>
+      </div>
+    `;
+  } else {
+    bar.innerHTML = `
+      <button class="btn btn-success" onclick="saveAllData()">💾 Simpan Semua Data</button>
+      <button class="btn btn-outline" onclick="exportCSV()">📥 Export CSV</button>
+      <button class="btn btn-outline" style="color:red; border-color:red;" onclick="resetConfirm()">🗑️ Reset Data</button>
+      <span id="saveMsg" style="font-size:12px; color:green; margin-left:8px;"></span>
+      <button class="btn btn-outline" style="margin-left:auto;" onclick="isLocked=true;renderTable();">🔒 Kunci Kembali</button>
+    `;
+  }
 }
 
 function setField(no, field, val) {

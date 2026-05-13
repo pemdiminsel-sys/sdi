@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Settings, 
-  Database, 
-  Shield, 
-  Globe, 
-  Save, 
+import {
+  Settings,
+  Database,
+  Shield,
+  Globe,
+  Save,
   RotateCcw,
   RefreshCw,
   Key,
@@ -51,7 +51,7 @@ export default function SettingsPage() {
             <RotateCcw size={14} className="mr-2" />
             Reset Defaults
           </button>
-          <button 
+          <button
             onClick={handleSave}
             disabled={isSaving}
             className="btn-primary text-xs"
@@ -71,8 +71,8 @@ export default function SettingsPage() {
               onClick={() => setActiveTab(tab.id)}
               className={cn(
                 "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all border",
-                activeTab === tab.id 
-                  ? "bg-white/5 border-red-500/30 text-white shadow-[0_0_15px_rgba(239,68,68,0.1)]" 
+                activeTab === tab.id
+                  ? "bg-white/5 border-red-500/30 text-white shadow-[0_0_15px_rgba(239,68,68,0.1)]"
                   : "border-transparent text-slate-500 hover:text-slate-300 hover:bg-white/[0.02]"
               )}
             >
@@ -96,8 +96,8 @@ export default function SettingsPage() {
                 <div className="space-y-4">
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">API Base URL</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       defaultValue="https://sipd.go.id/ewalidata/serv"
                       className="input-field"
                     />
@@ -105,8 +105,8 @@ export default function SettingsPage() {
 
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">Kodepemda</label>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       defaultValue="7105"
                       className="input-field font-mono"
                     />
@@ -115,8 +115,8 @@ export default function SettingsPage() {
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 block">API Key / Token</label>
                     <div className="relative">
-                      <input 
-                        type="password" 
+                      <input
+                        type="password"
                         defaultValue="••••••••••••••••••••••••••••••••"
                         className="input-field pr-10"
                       />
@@ -190,7 +190,7 @@ export default function SettingsPage() {
                   <Edit3 size={18} className="text-red-400" />
                   <h2 className="text-lg font-bold text-white">Tentang SDI (About)</h2>
                 </div>
-                <textarea 
+                <textarea
                   rows={6}
                   className="input-field text-sm py-3"
                   placeholder="Tuliskan deskripsi tentang Portal Satu Data Indonesia Minahasa Selatan di sini..."
@@ -203,7 +203,7 @@ export default function SettingsPage() {
                   <Shield size={18} className="text-blue-400" />
                   <h2 className="text-lg font-bold text-white">Kebijakan Data (Privacy & Policy)</h2>
                 </div>
-                <textarea 
+                <textarea
                   rows={6}
                   className="input-field text-sm py-3"
                   placeholder="Tuliskan kebijakan penggunaan data..."
