@@ -88,8 +88,8 @@
 </header>
 
 <div class="main">
-  <div class="info-box">
-    ⚠️ <strong>Cara penggunaan:</strong> Buka setiap halaman Facebook, catat jumlah pengikut, frekuensi posting, dan tanggal terakhir posting. Masukkan data di tab <strong>Input Data</strong>, lalu lihat hasil pemeringkatan di tab <strong>Peringkat</strong>. Data tersimpan otomatis di browser Anda.
+  <div class="info-box" style="background: #e8f0fe; border: 1px solid #1877F2; color: #1558b0;">
+    🔒 <strong>Data Terkunci:</strong> Data pemeringkatan ini telah dikunci untuk keperluan laporan final. Fitur pengeditan dinonaktifkan.
   </div>
 
   <div class="tabs">
@@ -133,9 +133,8 @@
       </table>
     </div>
     <div class="action-bar">
-      <button class="btn btn-success" onclick="saveAllData()">💾 Simpan Semua Data</button>
+      <button class="btn btn-success" disabled style="opacity: 0.5; cursor: not-allowed;">🔒 Simpan Data Terkunci</button>
       <button class="btn btn-outline" onclick="exportCSV()">📥 Export CSV</button>
-      <button class="btn btn-outline" onclick="resetConfirm()">🗑️ Reset Data</button>
       <span id="saveMsg" style="font-size:12px; color:green; margin-left:8px;"></span>
       <span style="margin-left:auto; font-size:12px; color:#888;" id="filledCount">0 / 46 diisi</span>
     </div>
@@ -330,9 +329,9 @@ function renderTable() {
       <td class="nama">${r.nama}<br><span style="font-size:11px; color:#aaa;">${r.cat}</span></td>
       <td><span class="category-badge">${r.cat}</span></td>
       <td class="link"><a href="${r.url}" target="_blank">🔗 Buka FB</a></td>
-      <td><input class="num-input" type="number" min="0" placeholder="contoh: 250" value="${d.followers||''}" onchange="setField(${r.no},'followers',this.value)"></td>
+      <td><input class="num-input" type="number" disabled value="${d.followers||''}"></td>
       <td>
-        <select class="freq-select" onchange="setField(${r.no},'freq',this.value)">
+        <select class="freq-select" disabled>
           <option value="">— pilih —</option>
           <option value="0" ${d.freq=='0'?'selected':''}>Tidak posting</option>
           <option value="0.25" ${d.freq=='0.25'?'selected':''}>1x/bulan</option>
@@ -344,7 +343,7 @@ function renderTable() {
           <option value="7" ${d.freq=='7'?'selected':''}>Setiap hari</option>
         </select>
       </td>
-      <td><input class="date-input" type="date" value="${d.lastPost||''}" onchange="setField(${r.no},'lastPost',this.value)"></td>
+      <td><input class="date-input" type="date" disabled value="${d.lastPost||''}"></td>
       <td>
         ${hasData
           ? `<span class="score-badge" style="background:${st.bg}; color:${st.text};">${total}</span><br><span style="font-size:10px; color:${st.text};">${st.label}</span>`
