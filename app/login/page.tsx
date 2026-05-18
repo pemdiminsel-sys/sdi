@@ -20,7 +20,7 @@ export default function LoginPage() {
       // Set a fake session cookie
       document.cookie = "sdi-admin-session=true; path=/; max-age=86400";
       setIsLoading(false);
-      router.push("/admin");
+      router.push("/dashboard");
     }, 1500);
   };
 
