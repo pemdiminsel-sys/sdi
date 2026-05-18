@@ -24,76 +24,6 @@ function setCache<T>(key: string, data: T, ttlSeconds: number): void {
   memCache.set(key, { data, expires: Date.now() + ttlSeconds * 1000 });
 }
 
-// ---- Generate realistic demo/fallback data when API is unavailable ----
-function generateFallbackData(): DssdRecord[] {
-  const records: DssdRecord[] = [];
-  const opdNames = [...OPD_LIST];
-  const kategoriList = [...KATEGORI_DATASET].filter((k) => k !== "Lainnya");
-  const kecamatanList = [...KECAMATAN_MINSEL];
-
-  const indikatorConfig: Record<string, Array<{ name: string; unit: string; min: number; max: number }>> = {
-    Kependudukan: [
-      { name: "Jumlah Penduduk", unit: "Jiwa", min: 230000, max: 245000 },
-      { name: "Kepadatan Penduduk", unit: "Jiwa/Km2", min: 150, max: 200 },
-      { name: "Jumlah KK", unit: "KK", min: 70000, max: 85000 }
-    ],
-    Pendidikan: [
-      { name: "APK SD", unit: "Persen", min: 95, max: 99 },
-      { name: "APK Sekolah", unit: "Persen", min: 85, max: 95 },
-      { name: "Angka Melek Huruf", unit: "Persen", min: 98, max: 99 }
-    ],
-    Kesehatan: [
-      { name: "Prevalensi Stunting", unit: "Persen", min: 14, max: 22 },
-      { name: "Cakupan Imunisasi", unit: "Persen", min: 90, max: 96 }
-    ],
-    Kemiskinan: [
-      { name: "Tingkat Kemiskinan", unit: "Persen", min: 7.5, max: 10.2 },
-      { name: "Jumlah KPM PKH", unit: "Keluarga", min: 12000, max: 15000 }
-    ],
-    Infrastruktur: [
-      { name: "Panjang Jalan", unit: "Km", min: 800, max: 1200 },
-      { name: "Kondisi Jalan Baik", unit: "Persen", min: 60, max: 75 }
-    ],
-    Ekonomi: [
-      { name: "PDRB per Kapita", unit: "Juta Rp", min: 45, max: 55 },
-      { name: "Tingkat Pengangguran", unit: "Persen", min: 3, max: 5 }
-    ],
-    Pemerintahan: [
-      { name: "Jumlah ASN", unit: "Orang", min: 4200, max: 4500 },
-      { name: "Nilai SAKIP", unit: "Poin", min: 65, max: 75 }
-    ]
-  };
-
-  let idxGlobal = 1;
-  for (const opd of opdNames) {
-    const numRecords = Math.floor(Math.random() * 15) + 5;
-    for (let i = 0; i < numRecords; i++) {
-      const kat = kategoriList[Math.floor(Math.random() * kategoriList.length)];
-      const kec = kecamatanList[Math.floor(Math.random() * kecamatanList.length)];
-      const configs = indikatorConfig[kat] || [{ name: "Data Indikator", unit: "Unit", min: 10, max: 100 }];
-      const config = configs[Math.floor(Math.random() * configs.length)];
-      
-      const kode = `DS${String(idxGlobal).padStart(4, "0")}`;
-      
-      records.push({
-        id: String(idxGlobal),
-        kode_dssd: kode,
-        nama_dssd: config.name,
-        satuan: config.unit,
-        tahun: 2023 + Math.floor(Math.random() * 2),
-        nilai: parseFloat((Math.random() * (config.max - config.min) + config.min).toFixed(2)),
-        nama_opd: opd,
-        kecamatan_kode: kec.kode,
-        kecamatan_nama: kec.nama,
-        status_data: "Terisi",
-        kategori: kat,
-      });
-      idxGlobal++;
-    }
-  }
-  return records;
-}
-
 // Fetch with retry and exponential backoff
 async function fetchWithRetry(
   url: string,
@@ -149,14 +79,13 @@ export const sipdService = {
           return records;
         }
       }
-    } catch {
-      // API tidak tersedia — fallback ke demo data
+    } catch (err) {
+      console.error("[API FETCH ERROR]", err);
+      // API tidak tersedia — return array kosong tanpa demo data
+      return [];
     }
 
-    // Use demo data, cache for 5 minutes to avoid repeated generation
-    const fallback = generateFallbackData();
-    setCache(cacheKey, fallback, 300);
-    return fallback;
+    return [];
   },
 
   /**
@@ -298,9 +227,8 @@ export const sipdService = {
       if (error) throw error;
       return data;
     } catch (err) {
-      console.error("[DB FETCH ERROR]", err);
-      // Fallback ke API/Demo jika DB gagal atau kosong
-      return this.getDssd();
+      // DB gagal atau kosong, kembalikan array kosong (dummy sudah dihapus)
+      return [];
     }
   },
 

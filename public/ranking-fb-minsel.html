@@ -1,379 +1,762 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Version: 1.0.1-secure -->
-<title>Pemeringkatan Facebook OPD Minahasa Selatan</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f6fa; color: #222; font-size: 14px; }
-  header { background: #1877F2; color: white; padding: 18px 24px; display: flex; align-items: center; gap: 14px; }
-  header h1 { font-size: 20px; font-weight: 600; }
-  header p { font-size: 13px; opacity: 0.85; }
-  .main { max-width: 1200px; margin: 0 auto; padding: 20px; }
-  .info-box { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 12px 16px; margin-bottom: 18px; font-size: 13px; color: #856404; }
-  .tabs { display: flex; gap: 4px; margin-bottom: 18px; }
-  .tab { padding: 8px 18px; border-radius: 8px 8px 0 0; border: 1px solid #ddd; border-bottom: none; background: #eee; cursor: pointer; font-weight: 500; font-size: 13px; }
-  .tab.active { background: white; color: #1877F2; border-color: #1877F2; }
-  .panel { display: none; background: white; border: 1px solid #ddd; border-radius: 0 8px 8px 8px; padding: 0; overflow: hidden; }
-  .panel.active { display: block; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Version: 1.0.1-secure -->
+  <title>Pemeringkatan Facebook OPD Minahasa Selatan</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  /* Entry Panel */
-  .search-bar { padding: 14px 16px; border-bottom: 1px solid #eee; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-  .search-bar input { border: 1px solid #ccc; border-radius: 6px; padding: 7px 12px; font-size: 13px; width: 220px; }
-  .search-bar select { border: 1px solid #ccc; border-radius: 6px; padding: 7px 12px; font-size: 13px; }
-  .search-bar .legend { font-size: 12px; color: #555; margin-left: auto; }
-  table { width: 100%; border-collapse: collapse; }
-  thead th { background: #f0f4ff; padding: 10px 12px; text-align: left; font-size: 12px; color: #444; border-bottom: 2px solid #dce3f0; position: sticky; top: 0; }
-  tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.1s; }
-  tbody tr:hover { background: #f7f9ff; }
-  td { padding: 9px 12px; vertical-align: middle; }
-  td.no { font-weight: 600; color: #888; width: 36px; }
-  td.nama { font-weight: 500; max-width: 200px; }
-  td.link a { color: #1877F2; font-size: 12px; text-decoration: none; }
-  td.link a:hover { text-decoration: underline; }
-  .num-input { width: 90px; border: 1px solid #ccc; border-radius: 5px; padding: 5px 8px; font-size: 13px; text-align: right; }
-  .num-input:focus { outline: 2px solid #1877F2; border-color: transparent; }
-  .date-input { width: 130px; border: 1px solid #ccc; border-radius: 5px; padding: 5px 8px; font-size: 12px; }
-  .freq-select { width: 110px; border: 1px solid #ccc; border-radius: 5px; padding: 5px 8px; font-size: 12px; }
-  .score-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-weight: 600; font-size: 12px; }
-  .tbl-wrap { max-height: 520px; overflow-y: auto; }
-  .btn { padding: 8px 18px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 500; }
-  .btn-primary { background: #1877F2; color: white; }
-  .btn-primary:hover { background: #1558b0; }
-  .btn-success { background: #28a745; color: white; }
-  .btn-success:hover { background: #1e7e34; }
-  .btn-outline { background: white; color: #1877F2; border: 1px solid #1877F2; }
-  .btn-outline:hover { background: #e8f0fe; }
-  .action-bar { padding: 12px 16px; display: flex; gap: 10px; align-items: center; border-top: 1px solid #eee; background: #fafbff; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f5f6fa;
+      color: #222;
+      font-size: 14px;
+    }
 
-  /* Ranking Panel */
-  .rank-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; }
-  .rank-list { }
-  .rank-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 8px; background: white; }
-  .rank-num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; }
-  .rank-1 { background: #FFD700; color: #7a5f00; }
-  .rank-2 { background: #C0C0C0; color: #4a4a4a; }
-  .rank-3 { background: #CD7F32; color: white; }
-  .rank-other { background: #eee; color: #666; }
-  .rank-nama { flex: 1; font-weight: 500; font-size: 13px; }
-  .rank-score { font-weight: 700; color: #1877F2; font-size: 14px; }
-  .rank-detail { font-size: 11px; color: #888; }
-  .chart-wrap { }
-  .summary-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 20px 20px 0; }
-  .scard { background: #f0f4ff; border-radius: 8px; padding: 14px; text-align: center; }
-  .scard .val { font-size: 22px; font-weight: 700; color: #1877F2; }
-  .scard .lbl { font-size: 12px; color: #666; margin-top: 4px; }
-  .sort-btn { background: none; border: none; cursor: pointer; color: #888; font-size: 11px; }
-  .sort-btn:hover { color: #1877F2; }
-  .filter-type { display: flex; gap: 6px; align-items: center; }
-  .category-badge { font-size: 11px; padding: 2px 7px; border-radius: 10px; background: #e8f0fe; color: #1877F2; }
-  .no-data { text-align: center; padding: 40px; color: #aaa; font-style: italic; }
-  .progress-bar { height: 6px; background: #eee; border-radius: 3px; overflow: hidden; margin-top: 3px; }
-  .progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #1877F2, #42a5f5); }
-  .help-text { font-size: 11px; color: #999; }
-  @media print { .no-print { display: none; } }
-</style>
+    header {
+      background: #1877F2;
+      color: white;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    header h1 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    header p {
+      font-size: 13px;
+      opacity: 0.85;
+    }
+
+    .main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .info-box {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      font-size: 13px;
+      color: #856404;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 18px;
+    }
+
+    .tab {
+      padding: 8px 18px;
+      border-radius: 8px 8px 0 0;
+      border: 1px solid #ddd;
+      border-bottom: none;
+      background: #eee;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 13px;
+    }
+
+    .tab.active {
+      background: white;
+      color: #1877F2;
+      border-color: #1877F2;
+    }
+
+    .panel {
+      display: none;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 0 8px 8px 8px;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    /* Entry Panel */
+    .search-bar {
+      padding: 14px 16px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-bar input {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 7px 12px;
+      font-size: 13px;
+      width: 220px;
+    }
+
+    .search-bar select {
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 7px 12px;
+      font-size: 13px;
+    }
+
+    .search-bar .legend {
+      font-size: 12px;
+      color: #555;
+      margin-left: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      background: #f0f4ff;
+      padding: 10px 12px;
+      text-align: left;
+      font-size: 12px;
+      color: #444;
+      border-bottom: 2px solid #dce3f0;
+      position: sticky;
+      top: 0;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #f0f0f0;
+      transition: background 0.1s;
+    }
+
+    tbody tr:hover {
+      background: #f7f9ff;
+    }
+
+    td {
+      padding: 9px 12px;
+      vertical-align: middle;
+    }
+
+    td.no {
+      font-weight: 600;
+      color: #888;
+      width: 36px;
+    }
+
+    td.nama {
+      font-weight: 500;
+      max-width: 200px;
+    }
+
+    td.link a {
+      color: #1877F2;
+      font-size: 12px;
+      text-decoration: none;
+    }
+
+    td.link a:hover {
+      text-decoration: underline;
+    }
+
+    .num-input {
+      width: 90px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 5px 8px;
+      font-size: 13px;
+      text-align: right;
+    }
+
+    .num-input:focus {
+      outline: 2px solid #1877F2;
+      border-color: transparent;
+    }
+
+    .date-input {
+      width: 130px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+    }
+
+    .freq-select {
+      width: 110px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 5px 8px;
+      font-size: 12px;
+    }
+
+    .score-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .tbl-wrap {
+      max-height: 520px;
+      overflow-y: auto;
+    }
+
+    .btn {
+      padding: 8px 18px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .btn-primary {
+      background: #1877F2;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1558b0;
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #1e7e34;
+    }
+
+    .btn-outline {
+      background: white;
+      color: #1877F2;
+      border: 1px solid #1877F2;
+    }
+
+    .btn-outline:hover {
+      background: #e8f0fe;
+    }
+
+    .action-bar {
+      padding: 12px 16px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      border-top: 1px solid #eee;
+      background: #fafbff;
+    }
+
+    /* Ranking Panel */
+    .rank-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .rank-list {}
+
+    .rank-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #eee;
+      margin-bottom: 8px;
+      background: white;
+    }
+
+    .rank-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .rank-1 {
+      background: #FFD700;
+      color: #7a5f00;
+    }
+
+    .rank-2 {
+      background: #C0C0C0;
+      color: #4a4a4a;
+    }
+
+    .rank-3 {
+      background: #CD7F32;
+      color: white;
+    }
+
+    .rank-other {
+      background: #eee;
+      color: #666;
+    }
+
+    .rank-nama {
+      flex: 1;
+      font-weight: 500;
+      font-size: 13px;
+    }
+
+    .rank-score {
+      font-weight: 700;
+      color: #1877F2;
+      font-size: 14px;
+    }
+
+    .rank-detail {
+      font-size: 11px;
+      color: #888;
+    }
+
+    .chart-wrap {}
+
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding: 20px 20px 0;
+    }
+
+    .scard {
+      background: #f0f4ff;
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .scard .val {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1877F2;
+    }
+
+    .scard .lbl {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .sort-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #888;
+      font-size: 11px;
+    }
+
+    .sort-btn:hover {
+      color: #1877F2;
+    }
+
+    .filter-type {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .category-badge {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 10px;
+      background: #e8f0fe;
+      color: #1877F2;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #aaa;
+      font-style: italic;
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: #eee;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 3px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #1877F2, #42a5f5);
+    }
+
+    .help-text {
+      font-size: 11px;
+      color: #999;
+    }
+
+    @media print {
+      .no-print {
+        display: none;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<header>
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="white" fill-opacity="0.2"/><path d="M17.5 26V18h2.7l.4-3H17.5v-2c0-.87.24-1.46 1.5-1.46h1.6V8.1C20.25 8.04 19.3 8 18.2 8c-2.4 0-4 1.46-4 4.14V15H11.5v3H14.2v8H17.5z" fill="white"/></svg>
-  <div>
-    <h1>Pemeringkatan Facebook OPD Kabupaten Minahasa Selatan</h1>
-    <p>Monitoring & Evaluasi Media Sosial — 46 Halaman Facebook</p>
-  </div>
-  <div style="margin-left:auto; font-size:12px; opacity:0.8;">Diperbarui: <span id="last-update">—</span></div>
-</header>
-
-<div class="main">
-  <div class="info-box" style="background: #e8f0fe; border: 1px solid #1877F2; color: #1558b0;">
-    🔒 <strong>Data Terkunci:</strong> Data pemeringkatan ini telah dikunci untuk keperluan laporan final. Fitur pengeditan dinonaktifkan.
-  </div>
-
-  <div class="tabs">
-    <div class="tab active no-print" onclick="showTab('input')">📝 Input Data</div>
-    <div class="tab no-print" onclick="showTab('ranking')">🏆 Peringkat & Analisis</div>
-    <div class="tab no-print" onclick="showTab('panduan')">❓ Panduan Penilaian</div>
-  </div>
-
-  <!-- INPUT PANEL -->
-  <div class="panel active" id="panel-input">
-    <div class="search-bar">
-      <input type="text" id="searchBox" placeholder="🔍 Cari nama OPD..." oninput="filterTable()">
-      <select id="filterCat" onchange="filterTable()">
-        <option value="">Semua Kategori</option>
-        <option value="Kecamatan">Kecamatan</option>
-        <option value="Dinas">Dinas</option>
-        <option value="Bagian">Bagian / Sekretariat</option>
-      </select>
-      <select id="filterStatus" onchange="filterTable()">
-        <option value="">Semua Status</option>
-        <option value="filled">Data sudah diisi</option>
-        <option value="empty">Belum diisi</option>
-      </select>
-      <div class="legend">💡 Klik sel untuk edit langsung</div>
+  <header>
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="white" fill-opacity="0.2" />
+      <path
+        d="M17.5 26V18h2.7l.4-3H17.5v-2c0-.87.24-1.46 1.5-1.46h1.6V8.1C20.25 8.04 19.3 8 18.2 8c-2.4 0-4 1.46-4 4.14V15H11.5v3H14.2v8H17.5z"
+        fill="white" />
+    </svg>
+    <div>
+      <h1>Pemeringkatan Facebook OPD Kabupaten Minahasa Selatan</h1>
+      <p>Monitoring & Evaluasi Media Sosial — 46 Halaman Facebook</p>
     </div>
-    <div class="tbl-wrap">
-      <table id="mainTable">
-        <thead>
-          <tr>
-            <th style="width:36px">No</th>
-            <th>Nama OPD</th>
-            <th>Kategori</th>
-            <th>Link Facebook</th>
-            <th>Pengikut (Followers) <span class="help-text">angka</span></th>
-            <th>Postingan/Minggu <span class="help-text">rata2</span></th>
-            <th>Posting Terakhir</th>
-            <th>Skor</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
+    <div style="margin-left:auto; font-size:12px; opacity:0.8;">Diperbarui: <span id="last-update">—</span></div>
+  </header>
+
+  <div class="main">
+    <div class="info-box" style="background: #e8f0fe; border: 1px solid #1877F2; color: #1558b0;">
+      🔒 <strong>Data Terkunci:</strong> Data pemeringkatan ini telah dikunci untuk keperluan laporan final. Fitur
+      pengeditan dinonaktifkan.
+    </div>
+
+    <div class="tabs">
+      <div class="tab active no-print" onclick="showTab('input')">📝 Input Data</div>
+      <div class="tab no-print" onclick="showTab('ranking')">🏆 Peringkat & Analisis</div>
+      <div class="tab no-print" onclick="showTab('panduan')">❓ Panduan Penilaian</div>
+    </div>
+
+    <!-- INPUT PANEL -->
+    <div class="panel active" id="panel-input">
+      <div class="search-bar">
+        <input type="text" id="searchBox" placeholder="🔍 Cari nama OPD..." oninput="filterTable()">
+        <select id="filterCat" onchange="filterTable()">
+          <option value="">Semua Kategori</option>
+          <option value="Kecamatan">Kecamatan</option>
+          <option value="Dinas">Dinas</option>
+          <option value="Bagian">Bagian / Sekretariat</option>
+        </select>
+        <select id="filterStatus" onchange="filterTable()">
+          <option value="">Semua Status</option>
+          <option value="filled">Data sudah diisi</option>
+          <option value="empty">Belum diisi</option>
+        </select>
+        <div class="legend">💡 Klik sel untuk edit langsung</div>
+      </div>
+      <div class="tbl-wrap">
+        <table id="mainTable">
+          <thead>
+            <tr>
+              <th style="width:36px">No</th>
+              <th>Nama OPD</th>
+              <th>Kategori</th>
+              <th>Link Facebook</th>
+              <th>Pengikut (Followers) <span class="help-text">angka</span></th>
+              <th>Postingan/Minggu <span class="help-text">rata2</span></th>
+              <th>Posting Terakhir</th>
+              <th>Skor</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div class="action-bar" id="action-bar-ui">
+        <!-- UI will be rendered by JS -->
+      </div>
+    </div>
+
+    <!-- RANKING PANEL -->
+    <div class="panel" id="panel-ranking">
+      <div class="summary-cards">
+        <div class="scard">
+          <div class="val" id="sum-total">0</div>
+          <div class="lbl">Total Pengikut Semua Halaman</div>
+        </div>
+        <div class="scard">
+          <div class="val" id="sum-active">0</div>
+          <div class="lbl">OPD yang Data Sudah Diisi</div>
+        </div>
+        <div class="scard">
+          <div class="val" id="sum-avg">0</div>
+          <div class="lbl">Rata-rata Pengikut per OPD</div>
+        </div>
+      </div>
+      <div class="rank-grid">
+        <div class="rank-list" id="rankList" style="max-height:500px; overflow-y:auto;"></div>
+        <div class="chart-wrap">
+          <div style="font-weight:600; font-size:14px; margin-bottom:10px; color:#333;">Top 15 OPD — Skor Gabungan</div>
+          <div style="position:relative; height:360px;">
+            <canvas id="rankChart" role="img" aria-label="Grafik batang top 15 OPD berdasarkan skor gabungan">Grafik
+              ranking OPD.</canvas>
+          </div>
+          <div style="margin-top:16px; font-weight:600; font-size:14px; color:#333; margin-bottom:8px;">Distribusi
+            Pengikut per Kategori</div>
+          <div style="position:relative; height:200px;">
+            <canvas id="catChart" role="img" aria-label="Grafik distribusi pengikut per kategori OPD">Distribusi
+              kategori.</canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANDUAN PANEL -->
+    <div class="panel" id="panel-panduan" style="padding:24px;">
+      <h2 style="font-size:16px; margin-bottom:16px;">📋 Panduan Pengisian & Formula Penilaian</h2>
+      <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <tr style="background:#f0f4ff;">
+          <th style="padding:10px; text-align:left; border:1px solid #ddd;">Indikator</th>
+          <th style="padding:10px; text-align:center; border:1px solid #ddd;">Bobot</th>
+          <th style="padding:10px; text-align:left; border:1px solid #ddd;">Cara Mengisi</th>
+        </tr>
+        <tr>
+          <td style="padding:10px; border:1px solid #ddd;">📊 Jumlah Pengikut</td>
+          <td style="padding:10px; text-align:center; border:1px solid #ddd;"><strong>50%</strong></td>
+          <td style="padding:10px; border:1px solid #ddd;">Buka halaman FB → lihat angka "Pengikut" atau "Followers" di
+            bawah nama halaman</td>
+        </tr>
+        <tr>
+          <td style="padding:10px; border:1px solid #ddd;">📝 Frekuensi Posting</td>
+          <td style="padding:10px; text-align:center; border:1px solid #ddd;"><strong>30%</strong></td>
+          <td style="padding:10px; border:1px solid #ddd;">Hitung rata-rata postingan per minggu dari 4 minggu terakhir
+            (pilih dari dropdown)</td>
+        </tr>
+        <tr>
+          <td style="padding:10px; border:1px solid #ddd;">📅 Kebaruan Konten</td>
+          <td style="padding:10px; text-align:center; border:1px solid #ddd;"><strong>20%</strong></td>
+          <td style="padding:10px; border:1px solid #ddd;">Tanggal postingan terakhir. Semakin baru = skor lebih tinggi
+            (≤7 hari = 100, ≤14 hari = 70, ≤30 hari = 40, >30 hari = 10)</td>
+        </tr>
       </table>
-    </div>
-    <div class="action-bar" id="action-bar-ui">
-      <!-- UI will be rendered by JS -->
-    </div>
-  </div>
-
-  <!-- RANKING PANEL -->
-  <div class="panel" id="panel-ranking">
-    <div class="summary-cards">
-      <div class="scard"><div class="val" id="sum-total">0</div><div class="lbl">Total Pengikut Semua Halaman</div></div>
-      <div class="scard"><div class="val" id="sum-active">0</div><div class="lbl">OPD yang Data Sudah Diisi</div></div>
-      <div class="scard"><div class="val" id="sum-avg">0</div><div class="lbl">Rata-rata Pengikut per OPD</div></div>
-    </div>
-    <div class="rank-grid">
-      <div class="rank-list" id="rankList" style="max-height:500px; overflow-y:auto;"></div>
-      <div class="chart-wrap">
-        <div style="font-weight:600; font-size:14px; margin-bottom:10px; color:#333;">Top 15 OPD — Skor Gabungan</div>
-        <div style="position:relative; height:360px;">
-          <canvas id="rankChart" role="img" aria-label="Grafik batang top 15 OPD berdasarkan skor gabungan">Grafik ranking OPD.</canvas>
-        </div>
-        <div style="margin-top:16px; font-weight:600; font-size:14px; color:#333; margin-bottom:8px;">Distribusi Pengikut per Kategori</div>
-        <div style="position:relative; height:200px;">
-          <canvas id="catChart" role="img" aria-label="Grafik distribusi pengikut per kategori OPD">Distribusi kategori.</canvas>
-        </div>
+      <div
+        style="margin-top:20px; background:#fff8e1; padding:14px; border-radius:8px; border-left:4px solid #ffc107; font-size:13px;">
+        <strong>Formula Skor:</strong><br><br>
+        Skor = (Skor_Pengikut × 0.5) + (Skor_Frekuensi × 0.3) + (Skor_Kebaruan × 0.2)<br><br>
+        Skor_Pengikut = (Followers_OPD / Max_Followers) × 100<br>
+        Skor_Frekuensi = (Posts_per_week / 7) × 100 (maks 100)<br>
+        Skor_Kebaruan = Berdasarkan tabel di atas
+      </div>
+      <div
+        style="margin-top:16px; background:#e8f5e9; padding:14px; border-radius:8px; border-left:4px solid #4caf50; font-size:13px;">
+        <strong>Klasifikasi Kinerja:</strong><br>
+        🟢 <strong>Sangat Aktif</strong> — Skor ≥ 70<br>
+        🔵 <strong>Aktif</strong> — Skor 50–69<br>
+        🟡 <strong>Cukup Aktif</strong> — Skor 30–49<br>
+        🔴 <strong>Kurang Aktif</strong> — Skor &lt; 30 atau belum ada data
       </div>
     </div>
   </div>
 
-  <!-- PANDUAN PANEL -->
-  <div class="panel" id="panel-panduan" style="padding:24px;">
-    <h2 style="font-size:16px; margin-bottom:16px;">📋 Panduan Pengisian & Formula Penilaian</h2>
-    <table style="width:100%; border-collapse:collapse; font-size:13px;">
-      <tr style="background:#f0f4ff;"><th style="padding:10px; text-align:left; border:1px solid #ddd;">Indikator</th><th style="padding:10px; text-align:center; border:1px solid #ddd;">Bobot</th><th style="padding:10px; text-align:left; border:1px solid #ddd;">Cara Mengisi</th></tr>
-      <tr><td style="padding:10px; border:1px solid #ddd;">📊 Jumlah Pengikut</td><td style="padding:10px; text-align:center; border:1px solid #ddd;"><strong>50%</strong></td><td style="padding:10px; border:1px solid #ddd;">Buka halaman FB → lihat angka "Pengikut" atau "Followers" di bawah nama halaman</td></tr>
-      <tr><td style="padding:10px; border:1px solid #ddd;">📝 Frekuensi Posting</td><td style="padding:10px; text-align:center; border:1px solid #ddd;"><strong>30%</strong></td><td style="padding:10px; border:1px solid #ddd;">Hitung rata-rata postingan per minggu dari 4 minggu terakhir (pilih dari dropdown)</td></tr>
-      <tr><td style="padding:10px; border:1px solid #ddd;">📅 Kebaruan Konten</td><td style="padding:10px; text-align:center; border:1px solid #ddd;"><strong>20%</strong></td><td style="padding:10px; border:1px solid #ddd;">Tanggal postingan terakhir. Semakin baru = skor lebih tinggi (≤7 hari = 100, ≤14 hari = 70, ≤30 hari = 40, >30 hari = 10)</td></tr>
-    </table>
-    <div style="margin-top:20px; background:#fff8e1; padding:14px; border-radius:8px; border-left:4px solid #ffc107; font-size:13px;">
-      <strong>Formula Skor:</strong><br><br>
-      Skor = (Skor_Pengikut × 0.5) + (Skor_Frekuensi × 0.3) + (Skor_Kebaruan × 0.2)<br><br>
-      Skor_Pengikut = (Followers_OPD / Max_Followers) × 100<br>
-      Skor_Frekuensi = (Posts_per_week / 7) × 100 (maks 100)<br>
-      Skor_Kebaruan = Berdasarkan tabel di atas
-    </div>
-    <div style="margin-top:16px; background:#e8f5e9; padding:14px; border-radius:8px; border-left:4px solid #4caf50; font-size:13px;">
-      <strong>Klasifikasi Kinerja:</strong><br>
-      🟢 <strong>Sangat Aktif</strong> — Skor ≥ 70<br>
-      🔵 <strong>Aktif</strong> — Skor 50–69<br>
-      🟡 <strong>Cukup Aktif</strong> — Skor 30–49<br>
-      🔴 <strong>Kurang Aktif</strong> — Skor &lt; 30 atau belum ada data
-    </div>
-  </div>
-</div>
+  <script>
+    const DATA = [
+      { no: 1, nama: "Bagian Hukum Setda Minsel", url: "https://www.facebook.com/profile.php?id=61583522570255", cat: "Bagian" },
+      { no: 2, nama: "Dinas Pertanian & Peternakan", url: "https://www.facebook.com/profile.php?id=61573746152792", cat: "Dinas" },
+      { no: 3, nama: "Dinas Perdagangan", url: "https://www.facebook.com/profile.php?id=61573542371832", cat: "Dinas" },
+      { no: 4, nama: "Bagian Organisasi Setda", url: "https://www.facebook.com/profile.php?id=61574164911386", cat: "Bagian" },
+      { no: 5, nama: "Dinas Koperasi & UMKM", url: "https://www.facebook.com/profile.php?id=61577898764909", cat: "Dinas" },
+      { no: 6, nama: "Kecamatan Motoling Barat", url: "https://www.facebook.com/profile.php?id=61573714901651", cat: "Kecamatan" },
+      { no: 7, nama: "Sekretariat DPRD", url: "https://www.facebook.com/profile.php?id=61573549113624", cat: "Bagian" },
+      { no: 8, nama: "Kecamatan Tenga", url: "https://www.facebook.com/profile.php?id=61573998016465", cat: "Kecamatan" },
+      { no: 9, nama: "Kecamatan Tumpaan", url: "https://www.facebook.com/profile.php?id=61574161829360", cat: "Kecamatan" },
+      { no: 10, nama: "Kecamatan Maesaan", url: "https://www.facebook.com/profile.php?id=61573692790615", cat: "Kecamatan" },
+      { no: 11, nama: "Kecamatan Motoling Timur", url: "https://www.facebook.com/profile.php?id=61574172830943", cat: "Kecamatan" },
+      { no: 12, nama: "Kecamatan Tatapaan", url: "https://www.facebook.com/profile.php?id=61574187925292", cat: "Kecamatan" },
+      { no: 13, nama: "Kecamatan Amurang Timur", url: "https://www.facebook.com/profile.php?id=61573609905041", cat: "Kecamatan" },
+      { no: 14, nama: "Kantor Kecamatan Amurang", url: "https://www.facebook.com/profile.php?id=61573547648299", cat: "Kecamatan" },
+      { no: 15, nama: "Kecamatan Tompaso Baru", url: "https://www.facebook.com/profile.php?id=61574132485263", cat: "Kecamatan" },
+      { no: 16, nama: "Kecamatan Modoinding", url: "https://www.facebook.com/profile.php?id=61573835502984", cat: "Kecamatan" },
+      { no: 17, nama: "Kecamatan Ranoyapo", url: "https://www.facebook.com/profile.php?id=61573709860762", cat: "Kecamatan" },
+      { no: 18, nama: "Kecamatan Kumelembuai", url: "https://www.facebook.com/profile.php?id=61573858388007", cat: "Kecamatan" },
+      { no: 19, nama: "Kecamatan Sinonsayang", url: "https://www.facebook.com/profile.php?id=61574213340871", cat: "Kecamatan" },
+      { no: 20, nama: "Dinas PUPR", url: "https://www.facebook.com/profile.php?id=61573829129066", cat: "Dinas" },
+      { no: 21, nama: "Dinas Pendidikan & Kebudayaan", url: "https://www.facebook.com/profile.php?id=61573253416177", cat: "Dinas" },
+      { no: 22, nama: "Dinas Perhubungan", url: "https://www.facebook.com/profile.php?id=61573456455210", cat: "Dinas" },
+      { no: 23, nama: "Dinas Tenaga Kerja & Transmigrasi", url: "https://www.facebook.com/profile.php?id=61574577050293", cat: "Dinas" },
+      { no: 24, nama: "Dinas Perumahan & Kawasan Permukiman", url: "https://www.facebook.com/profile.php?id=61573427417625", cat: "Dinas" },
+      { no: 25, nama: "Bagian SDA Setda", url: "https://www.facebook.com/profile.php?id=61573879922101", cat: "Bagian" },
+      { no: 26, nama: "Bagian Adm. Pembangunan Setda", url: "https://www.facebook.com/profile.php?id=61573619954553", cat: "Bagian" },
+      { no: 27, nama: "Bagian Kesra Setda", url: "https://www.facebook.com/profile.php?id=61573840922742", cat: "Bagian" },
+      { no: 28, nama: "Bagian Tapem Setda", url: "https://www.facebook.com/profile.php?id=61573418267588", cat: "Bagian" },
+      { no: 29, nama: "Kecamatan Amurang Barat", url: "https://www.facebook.com/profile.php?id=61573811735293", cat: "Kecamatan" },
+      { no: 30, nama: "Kecamatan Tareran", url: "https://www.facebook.com/profile.php?id=61573860787953", cat: "Kecamatan" },
+      { no: 31, nama: "Kecamatan Suluun Tareran", url: "https://www.facebook.com/profile.php?id=61574090336864", cat: "Kecamatan" },
+      { no: 32, nama: "Kecamatan Motoling", url: "https://www.facebook.com/profile.php?id=61573846594875", cat: "Kecamatan" },
+      { no: 33, nama: "Sekretariat Daerah", url: "https://www.facebook.com/profile.php?id=61573728220244", cat: "Bagian" },
+      { no: 34, nama: "Dinas Komunikasi dan Informatika", url: "https://www.facebook.com/profile.php?id=61573563161535", cat: "Dinas" },
+      { no: 35, nama: "Dinas Kependudukan dan Pencatatan Sipil", url: "https://www.facebook.com/profile.php?id=61573809563928", cat: "Dinas" },
+      { no: 36, nama: "Dinas Pangan", url: "https://www.facebook.com/profile.php?id=61573818629571", cat: "Dinas" },
+      { no: 37, nama: "Dinas Damkar dan Penyelamatan", url: "https://www.facebook.com/profile.php?id=61573990160701", cat: "Dinas" },
+      { no: 38, nama: "Dinas PPPA", url: "https://www.facebook.com/profile.php?id=61573963012059", cat: "Dinas" },
+      { no: 39, nama: "Dinas Pengendalian Penduduk & KB", url: "https://www.facebook.com/profile.php?id=61573456875778", cat: "Dinas" },
+      { no: 40, nama: "Dinas Pariwisata", url: "https://www.facebook.com/profile.php?id=61573521249526", cat: "Dinas" },
+      { no: 41, nama: "Dinas PMD", url: "https://www.facebook.com/profile.php?id=61573572965356", cat: "Dinas" },
+      { no: 42, nama: "Dinas Kesehatan", url: "https://www.facebook.com/profile.php?id=61573602122254", cat: "Dinas" },
+      { no: 43, nama: "Inspektorat Daerah", url: "https://www.facebook.com/profile.php?id=61573520224977", cat: "Bagian" },
+      { no: 44, nama: "Satpol PP", url: "https://www.facebook.com/profile.php?id=61573971771542", cat: "Dinas" },
+      { no: 45, nama: "Dinas Pemuda & Olahraga", url: "https://www.facebook.com/profile.php?id=61573125497535", cat: "Dinas" },
+      { no: 46, nama: "Dinas Sosial", url: "https://www.facebook.com/profile.php?id=61573581903164", cat: "Dinas" },
+    ];
 
-<script>
-const DATA = [
-  {no:1, nama:"Bagian Hukum Setda Minsel", url:"https://www.facebook.com/profile.php?id=61583522570255", cat:"Bagian"},
-  {no:2, nama:"Dinas Pertanian & Peternakan", url:"https://www.facebook.com/profile.php?id=61573746152792", cat:"Dinas"},
-  {no:3, nama:"Dinas Perdagangan", url:"https://www.facebook.com/profile.php?id=61573542371832", cat:"Dinas"},
-  {no:4, nama:"Bagian Organisasi Setda", url:"https://www.facebook.com/profile.php?id=61574164911386", cat:"Bagian"},
-  {no:5, nama:"Dinas Koperasi & UMKM", url:"https://www.facebook.com/profile.php?id=61577898764909", cat:"Dinas"},
-  {no:6, nama:"Kecamatan Motoling Barat", url:"https://www.facebook.com/profile.php?id=61573714901651", cat:"Kecamatan"},
-  {no:7, nama:"Sekretariat DPRD", url:"https://www.facebook.com/profile.php?id=61573549113624", cat:"Bagian"},
-  {no:8, nama:"Kecamatan Tenga", url:"https://www.facebook.com/profile.php?id=61573998016465", cat:"Kecamatan"},
-  {no:9, nama:"Kecamatan Tumpaan", url:"https://www.facebook.com/profile.php?id=61574161829360", cat:"Kecamatan"},
-  {no:10, nama:"Kecamatan Maesaan", url:"https://www.facebook.com/profile.php?id=61573692790615", cat:"Kecamatan"},
-  {no:11, nama:"Kecamatan Motoling Timur", url:"https://www.facebook.com/profile.php?id=61574172830943", cat:"Kecamatan"},
-  {no:12, nama:"Kecamatan Tatapaan", url:"https://www.facebook.com/profile.php?id=61574187925292", cat:"Kecamatan"},
-  {no:13, nama:"Kecamatan Amurang Timur", url:"https://www.facebook.com/profile.php?id=61573609905041", cat:"Kecamatan"},
-  {no:14, nama:"Kantor Kecamatan Amurang", url:"https://www.facebook.com/profile.php?id=61573547648299", cat:"Kecamatan"},
-  {no:15, nama:"Kecamatan Tompaso Baru", url:"https://www.facebook.com/profile.php?id=61574132485263", cat:"Kecamatan"},
-  {no:16, nama:"Kecamatan Modoinding", url:"https://www.facebook.com/profile.php?id=61573835502984", cat:"Kecamatan"},
-  {no:17, nama:"Kecamatan Ranoyapo", url:"https://www.facebook.com/profile.php?id=61573709860762", cat:"Kecamatan"},
-  {no:18, nama:"Kecamatan Kumelembuai", url:"https://www.facebook.com/profile.php?id=61573858388007", cat:"Kecamatan"},
-  {no:19, nama:"Kecamatan Sinonsayang", url:"https://www.facebook.com/profile.php?id=61574213340871", cat:"Kecamatan"},
-  {no:20, nama:"Dinas PUPR", url:"https://www.facebook.com/profile.php?id=61573829129066", cat:"Dinas"},
-  {no:21, nama:"Dinas Pendidikan & Kebudayaan", url:"https://www.facebook.com/profile.php?id=61573253416177", cat:"Dinas"},
-  {no:22, nama:"Dinas Perhubungan", url:"https://www.facebook.com/profile.php?id=61573456455210", cat:"Dinas"},
-  {no:23, nama:"Dinas Tenaga Kerja & Transmigrasi", url:"https://www.facebook.com/profile.php?id=61574577050293", cat:"Dinas"},
-  {no:24, nama:"Dinas Perumahan & Kawasan Permukiman", url:"https://www.facebook.com/profile.php?id=61573427417625", cat:"Dinas"},
-  {no:25, nama:"Bagian SDA Setda", url:"https://www.facebook.com/profile.php?id=61573879922101", cat:"Bagian"},
-  {no:26, nama:"Bagian Adm. Pembangunan Setda", url:"https://www.facebook.com/profile.php?id=61573619954553", cat:"Bagian"},
-  {no:27, nama:"Bagian Kesra Setda", url:"https://www.facebook.com/profile.php?id=61573840922742", cat:"Bagian"},
-  {no:28, nama:"Bagian Tapem Setda", url:"https://www.facebook.com/profile.php?id=61573418267588", cat:"Bagian"},
-  {no:29, nama:"Kecamatan Amurang Barat", url:"https://www.facebook.com/profile.php?id=61573811735293", cat:"Kecamatan"},
-  {no:30, nama:"Kecamatan Tareran", url:"https://www.facebook.com/profile.php?id=61573860787953", cat:"Kecamatan"},
-  {no:31, nama:"Kecamatan Suluun Tareran", url:"https://www.facebook.com/profile.php?id=61574090336864", cat:"Kecamatan"},
-  {no:32, nama:"Kecamatan Motoling", url:"https://www.facebook.com/profile.php?id=61573846594875", cat:"Kecamatan"},
-  {no:33, nama:"Sekretariat Daerah", url:"https://www.facebook.com/profile.php?id=61573728220244", cat:"Bagian"},
-  {no:34, nama:"Dinas Komunikasi dan Informatika", url:"https://www.facebook.com/profile.php?id=61573563161535", cat:"Dinas"},
-  {no:35, nama:"Dinas Kependudukan dan Pencatatan Sipil", url:"https://www.facebook.com/profile.php?id=61573809563928", cat:"Dinas"},
-  {no:36, nama:"Dinas Pangan", url:"https://www.facebook.com/profile.php?id=61573818629571", cat:"Dinas"},
-  {no:37, nama:"Dinas Damkar dan Penyelamatan", url:"https://www.facebook.com/profile.php?id=61573990160701", cat:"Dinas"},
-  {no:38, nama:"Dinas PPPA", url:"https://www.facebook.com/profile.php?id=61573963012059", cat:"Dinas"},
-  {no:39, nama:"Dinas Pengendalian Penduduk & KB", url:"https://www.facebook.com/profile.php?id=61573456875778", cat:"Dinas"},
-  {no:40, nama:"Dinas Pariwisata", url:"https://www.facebook.com/profile.php?id=61573521249526", cat:"Dinas"},
-  {no:41, nama:"Dinas PMD", url:"https://www.facebook.com/profile.php?id=61573572965356", cat:"Dinas"},
-  {no:42, nama:"Dinas Kesehatan", url:"https://www.facebook.com/profile.php?id=61573602122254", cat:"Dinas"},
-  {no:43, nama:"Inspektorat Daerah", url:"https://www.facebook.com/profile.php?id=61573520224977", cat:"Bagian"},
-  {no:44, nama:"Satpol PP", url:"https://www.facebook.com/profile.php?id=61573971771542", cat:"Dinas"},
-  {no:45, nama:"Dinas Pemuda & Olahraga", url:"https://www.facebook.com/profile.php?id=61573125497535", cat:"Dinas"},
-  {no:46, nama:"Dinas Sosial", url:"https://www.facebook.com/profile.php?id=61573581903164", cat:"Dinas"},
-];
+    let userData = {};
+    let rankChartInst = null;
+    let catChartInst = null;
+    let isLocked = true;
 
-let userData = {};
-let rankChartInst = null;
-let catChartInst = null;
-let isLocked = true;
+    function checkLock() {
+      const pass = document.getElementById('unlockPass')?.value;
+      if (pass === 'Testing123') {
+        isLocked = false;
+        alert('✅ Akses pengeditan dibuka!');
+        renderTable();
+        renderActionBar();
+      } else {
+        alert('❌ Password salah!');
+      }
+    }
 
-function checkLock() {
-  const pass = document.getElementById('unlockPass')?.value;
-  if (pass === 'Testing123') {
-    isLocked = false;
-    alert('✅ Akses pengeditan dibuka!');
-    renderTable();
-    renderActionBar();
-  } else {
-    alert('❌ Password salah!');
-  }
-}
+    function loadData() {
+      try {
+        const saved = localStorage.getItem('minsel_fb_ranking');
+        if (saved) { userData = JSON.parse(saved); }
+      } catch (e) { }
+    }
 
-function loadData() {
-  try {
-    const saved = localStorage.getItem('minsel_fb_ranking');
-    if (saved) { userData = JSON.parse(saved); }
-  } catch(e) {}
-}
+    function saveData() {
+      try {
+        localStorage.setItem('minsel_fb_ranking', JSON.stringify(userData));
+        localStorage.setItem('minsel_fb_updated', new Date().toLocaleString('id-ID'));
+        document.getElementById('last-update').textContent = localStorage.getItem('minsel_fb_updated') || '—';
+      } catch (e) { }
+    }
 
-function saveData() {
-  try {
-    localStorage.setItem('minsel_fb_ranking', JSON.stringify(userData));
-    localStorage.setItem('minsel_fb_updated', new Date().toLocaleString('id-ID'));
-    document.getElementById('last-update').textContent = localStorage.getItem('minsel_fb_updated') || '—';
-  } catch(e) {}
-}
+    function calcScore(d) {
+      if (!d || (!d.followers && !d.freq && !d.lastPost)) return null;
+      return d;
+    }
 
-function calcScore(d) {
-  if (!d || (!d.followers && !d.freq && !d.lastPost)) return null;
-  return d;
-}
+    function getRecencyScore(dateStr) {
+      if (!dateStr) return 0;
+      const diff = Math.floor((new Date() - new Date(dateStr)) / 86400000);
+      if (diff <= 7) return 100;
+      if (diff <= 14) return 70;
+      if (diff <= 30) return 40;
+      return 10;
+    }
 
-function getRecencyScore(dateStr) {
-  if (!dateStr) return 0;
-  const diff = Math.floor((new Date() - new Date(dateStr)) / 86400000);
-  if (diff <= 7) return 100;
-  if (diff <= 14) return 70;
-  if (diff <= 30) return 40;
-  return 10;
-}
+    function computeScore(no, maxFollowers) {
+      const d = userData[no] || {};
+      const followers = parseInt(d.followers) || 0;
+      const freq = parseFloat(d.freq) || 0;
+      const recency = getRecencyScore(d.lastPost);
+      const followerScore = maxFollowers > 0 ? (followers / maxFollowers) * 100 : 0;
+      const freqScore = Math.min((freq / 7) * 100, 100);
+      return {
+        total: Math.round(followerScore * 0.5 + freqScore * 0.3 + recency * 0.2),
+        followerScore: Math.round(followerScore),
+        freqScore: Math.round(freqScore),
+        recencyScore: recency
+      };
+    }
 
-function computeScore(no, maxFollowers) {
-  const d = userData[no] || {};
-  const followers = parseInt(d.followers) || 0;
-  const freq = parseFloat(d.freq) || 0;
-  const recency = getRecencyScore(d.lastPost);
-  const followerScore = maxFollowers > 0 ? (followers / maxFollowers) * 100 : 0;
-  const freqScore = Math.min((freq / 7) * 100, 100);
-  return {
-    total: Math.round(followerScore * 0.5 + freqScore * 0.3 + recency * 0.2),
-    followerScore: Math.round(followerScore),
-    freqScore: Math.round(freqScore),
-    recencyScore: recency
-  };
-}
+    function getMaxFollowers() {
+      let max = 0;
+      DATA.forEach(r => {
+        const f = parseInt((userData[r.no] || {}).followers) || 0;
+        if (f > max) max = f;
+      });
+      return max;
+    }
 
-function getMaxFollowers() {
-  let max = 0;
-  DATA.forEach(r => {
-    const f = parseInt((userData[r.no] || {}).followers) || 0;
-    if (f > max) max = f;
-  });
-  return max;
-}
+    function getStatusColor(score, hasData) {
+      if (!hasData) return { bg: '#f5f5f5', text: '#bbb', label: 'Belum ada data' };
+      if (score >= 70) return { bg: '#e8f5e9', text: '#2e7d32', label: 'Sangat Aktif' };
+      if (score >= 50) return { bg: '#e3f2fd', text: '#1565c0', label: 'Aktif' };
+      if (score >= 30) return { bg: '#fff8e1', text: '#f57f17', label: 'Cukup Aktif' };
+      return { bg: '#ffebee', text: '#c62828', label: 'Kurang Aktif' };
+    }
 
-function getStatusColor(score, hasData) {
-  if (!hasData) return { bg:'#f5f5f5', text:'#bbb', label:'Belum ada data' };
-  if (score >= 70) return { bg:'#e8f5e9', text:'#2e7d32', label:'Sangat Aktif' };
-  if (score >= 50) return { bg:'#e3f2fd', text:'#1565c0', label:'Aktif' };
-  if (score >= 30) return { bg:'#fff8e1', text:'#f57f17', label:'Cukup Aktif' };
-  return { bg:'#ffebee', text:'#c62828', label:'Kurang Aktif' };
-}
+    function renderTable() {
+      const search = document.getElementById('searchBox').value.toLowerCase();
+      const cat = document.getElementById('filterCat').value;
+      const status = document.getElementById('filterStatus').value;
+      const maxF = getMaxFollowers();
+      const tbody = document.getElementById('tableBody');
+      let rows = '';
+      let filledCount = 0;
 
-function renderTable() {
-  const search = document.getElementById('searchBox').value.toLowerCase();
-  const cat = document.getElementById('filterCat').value;
-  const status = document.getElementById('filterStatus').value;
-  const maxF = getMaxFollowers();
-  const tbody = document.getElementById('tableBody');
-  let rows = '';
-  let filledCount = 0;
+      DATA.forEach(r => {
+        const d = userData[r.no] || {};
+        const hasData = !!(d.followers || d.freq || d.lastPost);
+        if (hasData) filledCount++;
+        const { total } = computeScore(r.no, maxF);
+        const st = getStatusColor(total, hasData);
 
-  DATA.forEach(r => {
-    const d = userData[r.no] || {};
-    const hasData = !!(d.followers || d.freq || d.lastPost);
-    if (hasData) filledCount++;
-    const { total } = computeScore(r.no, maxF);
-    const st = getStatusColor(total, hasData);
+        if (search && !r.nama.toLowerCase().includes(search)) return;
+        if (cat && r.cat !== cat) return;
+        if (status === 'filled' && !hasData) return;
+        if (status === 'empty' && hasData) return;
 
-    if (search && !r.nama.toLowerCase().includes(search)) return;
-    if (cat && r.cat !== cat) return;
-    if (status === 'filled' && !hasData) return;
-    if (status === 'empty' && hasData) return;
+        const isDisabled = isLocked ? 'disabled' : '';
 
-    const isDisabled = isLocked ? 'disabled' : '';
-
-    rows += `<tr>
+        rows += `<tr>
       <td class="no">${r.no}</td>
       <td class="nama">${r.nama}<br><span style="font-size:11px; color:#aaa;">${r.cat}</span></td>
       <td><span class="category-badge">${r.cat}</span></td>
       <td class="link"><a href="${r.url}" target="_blank">🔗 Buka FB</a></td>
-      <td><input class="num-input" type="number" ${isDisabled} min="0" placeholder="..." value="${d.followers||''}" onchange="setField(${r.no},'followers',this.value)"></td>
+      <td><input class="num-input" type="number" ${isDisabled} min="0" placeholder="..." value="${d.followers || ''}" onchange="setField(${r.no},'followers',this.value)"></td>
       <td>
         <select class="freq-select" ${isDisabled} onchange="setField(${r.no},'freq',this.value)">
           <option value="">— pilih —</option>
-          <option value="0" ${d.freq=='0'?'selected':''}>Tidak posting</option>
-          <option value="0.25" ${d.freq=='0.25'?'selected':''}>1x/bulan</option>
-          <option value="0.5" ${d.freq=='0.5'?'selected':''}>2x/bulan</option>
-          <option value="1" ${d.freq=='1'?'selected':''}>1x/minggu</option>
-          <option value="2" ${d.freq=='2'?'selected':''}>2x/minggu</option>
-          <option value="3" ${d.freq=='3'?'selected':''}>3x/minggu</option>
-          <option value="5" ${d.freq=='5'?'selected':''}>5x/minggu</option>
-          <option value="7" ${d.freq=='7'?'selected':''}>Setiap hari</option>
+          <option value="0" ${d.freq == '0' ? 'selected' : ''}>Tidak posting</option>
+          <option value="0.25" ${d.freq == '0.25' ? 'selected' : ''}>1x/bulan</option>
+          <option value="0.5" ${d.freq == '0.5' ? 'selected' : ''}>2x/bulan</option>
+          <option value="1" ${d.freq == '1' ? 'selected' : ''}>1x/minggu</option>
+          <option value="2" ${d.freq == '2' ? 'selected' : ''}>2x/minggu</option>
+          <option value="3" ${d.freq == '3' ? 'selected' : ''}>3x/minggu</option>
+          <option value="5" ${d.freq == '5' ? 'selected' : ''}>5x/minggu</option>
+          <option value="7" ${d.freq == '7' ? 'selected' : ''}>Setiap hari</option>
         </select>
       </td>
-      <td><input class="date-input" type="date" ${isDisabled} value="${d.lastPost||''}" onchange="setField(${r.no},'lastPost',this.value)"></td>
+      <td><input class="date-input" type="date" ${isDisabled} value="${d.lastPost || ''}" onchange="setField(${r.no},'lastPost',this.value)"></td>
       <td>
         ${hasData
-          ? `<span class="score-badge" style="background:${st.bg}; color:${st.text};">${total}</span><br><span style="font-size:10px; color:${st.text};">${st.label}</span>`
-          : `<span style="color:#ccc; font-size:12px;">—</span>`
-        }
+            ? `<span class="score-badge" style="background:${st.bg}; color:${st.text};">${total}</span><br><span style="font-size:10px; color:${st.text};">${st.label}</span>`
+            : `<span style="color:#ccc; font-size:12px;">—</span>`
+          }
       </td>
     </tr>`;
-  });
+      });
 
-  tbody.innerHTML = rows || '<tr><td colspan="8" class="no-data">Tidak ada data yang cocok dengan filter</td></tr>';
-  renderActionBar(filledCount);
-}
+      tbody.innerHTML = rows || '<tr><td colspan="8" class="no-data">Tidak ada data yang cocok dengan filter</td></tr>';
+      renderActionBar(filledCount);
+    }
 
-function renderActionBar(filledCount) {
-  const bar = document.getElementById('action-bar-ui');
-  if (isLocked) {
-    bar.innerHTML = `
+    function renderActionBar(filledCount) {
+      const bar = document.getElementById('action-bar-ui');
+      if (isLocked) {
+        bar.innerHTML = `
       <div style="display:flex; align-items:center; gap:10px; width:100%;">
         <div style="display:flex; align-items:center; gap:6px; background:#fff; border:1px solid #ddd; padding:4px 10px; border-radius:8px;">
           <span style="font-size:12px; color:#666;">🔑 Password:</span>
@@ -384,163 +767,164 @@ function renderActionBar(filledCount) {
         <span style="margin-left:auto; font-size:12px; color:#888;">${filledCount || 0} / 46 diisi (Mode Read-Only)</span>
       </div>
     `;
-  } else {
-    bar.innerHTML = `
+      } else {
+        bar.innerHTML = `
       <button class="btn btn-success" onclick="saveAllData()">💾 Simpan Semua Data</button>
       <button class="btn btn-outline" onclick="exportCSV()">📥 Export CSV</button>
       <button class="btn btn-outline" style="color:red; border-color:red;" onclick="resetConfirm()">🗑️ Reset Data</button>
       <span id="saveMsg" style="font-size:12px; color:green; margin-left:8px;"></span>
       <button class="btn btn-outline" style="margin-left:auto;" onclick="isLocked=true;renderTable();">🔒 Kunci Kembali</button>
     `;
-  }
-}
+      }
+    }
 
-function setField(no, field, val) {
-  if (!userData[no]) userData[no] = {};
-  userData[no][field] = val;
-  saveData();
-  renderTable();
-}
+    function setField(no, field, val) {
+      if (!userData[no]) userData[no] = {};
+      userData[no][field] = val;
+      saveData();
+      renderTable();
+    }
 
-function filterTable() { renderTable(); }
+    function filterTable() { renderTable(); }
 
-function saveAllData() {
-  saveData();
-  const msg = document.getElementById('saveMsg');
-  msg.textContent = '✅ Data berhasil disimpan!';
-  setTimeout(() => { msg.textContent = ''; }, 3000);
-}
+    function saveAllData() {
+      saveData();
+      const msg = document.getElementById('saveMsg');
+      msg.textContent = '✅ Data berhasil disimpan!';
+      setTimeout(() => { msg.textContent = ''; }, 3000);
+    }
 
-function resetConfirm() {
-  if (confirm('Yakin ingin menghapus semua data yang sudah diisi?')) {
-    userData = {};
-    saveData();
-    renderTable();
-  }
-}
+    function resetConfirm() {
+      if (confirm('Yakin ingin menghapus semua data yang sudah diisi?')) {
+        userData = {};
+        saveData();
+        renderTable();
+      }
+    }
 
-function exportCSV() {
-  const maxF = getMaxFollowers();
-  let csv = 'No,Nama OPD,Kategori,Link Facebook,Pengikut,Postingan/Minggu,Posting Terakhir,Skor\n';
-  const ranked = DATA.map(r => {
-    const d = userData[r.no] || {};
-    const { total } = computeScore(r.no, maxF);
-    return { ...r, followers: d.followers||'', freq: d.freq||'', lastPost: d.lastPost||'', score: total };
-  }).sort((a,b) => b.score - a.score);
+    function exportCSV() {
+      const maxF = getMaxFollowers();
+      let csv = 'No,Nama OPD,Kategori,Link Facebook,Pengikut,Postingan/Minggu,Posting Terakhir,Skor\n';
+      const ranked = DATA.map(r => {
+        const d = userData[r.no] || {};
+        const { total } = computeScore(r.no, maxF);
+        return { ...r, followers: d.followers || '', freq: d.freq || '', lastPost: d.lastPost || '', score: total };
+      }).sort((a, b) => b.score - a.score);
 
-  ranked.forEach(r => {
-    csv += `${r.no},"${r.nama}",${r.cat},${r.url},${r.followers},${r.freq},${r.lastPost},${r.score}\n`;
-  });
+      ranked.forEach(r => {
+        csv += `${r.no},"${r.nama}",${r.cat},${r.url},${r.followers},${r.freq},${r.lastPost},${r.score}\n`;
+      });
 
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = `ranking_fb_minsel_${new Date().toISOString().slice(0,10)}.csv`;
-  link.click();
-}
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `ranking_fb_minsel_${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+    }
 
-function renderRanking() {
-  const maxF = getMaxFollowers();
-  const ranked = DATA.map(r => {
-    const d = userData[r.no] || {};
-    const hasData = !!(d.followers || d.freq || d.lastPost);
-    const sc = computeScore(r.no, maxF);
-    return { ...r, ...d, ...sc, hasData };
-  }).sort((a,b) => b.total - a.total);
+    function renderRanking() {
+      const maxF = getMaxFollowers();
+      const ranked = DATA.map(r => {
+        const d = userData[r.no] || {};
+        const hasData = !!(d.followers || d.freq || d.lastPost);
+        const sc = computeScore(r.no, maxF);
+        return { ...r, ...d, ...sc, hasData };
+      }).sort((a, b) => b.total - a.total);
 
-  const filled = ranked.filter(r => r.hasData);
-  const totalFollowers = filled.reduce((s,r) => s + (parseInt(r.followers)||0), 0);
+      const filled = ranked.filter(r => r.hasData);
+      const totalFollowers = filled.reduce((s, r) => s + (parseInt(r.followers) || 0), 0);
 
-  document.getElementById('sum-total').textContent = totalFollowers.toLocaleString('id-ID');
-  document.getElementById('sum-active').textContent = filled.length;
-  document.getElementById('sum-avg').textContent = filled.length ? Math.round(totalFollowers / filled.length).toLocaleString('id-ID') : '0';
+      document.getElementById('sum-total').textContent = totalFollowers.toLocaleString('id-ID');
+      document.getElementById('sum-active').textContent = filled.length;
+      document.getElementById('sum-avg').textContent = filled.length ? Math.round(totalFollowers / filled.length).toLocaleString('id-ID') : '0';
 
-  // Rank list
-  const list = document.getElementById('rankList');
-  if (filled.length === 0) {
-    list.innerHTML = '<div class="no-data" style="padding:30px; text-align:center; color:#aaa;">Belum ada data yang diisi.<br>Silakan isi data di tab Input Data.</div>';
-  } else {
-    list.innerHTML = ranked.filter(r => r.hasData).map((r, i) => {
-      const st = getStatusColor(r.total, r.hasData);
-      const numClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-other';
-      const pct = Math.round((r.total / 100) * 100);
-      return `<div class="rank-item">
-        <div class="rank-num ${numClass}">${i+1}</div>
+      // Rank list
+      const list = document.getElementById('rankList');
+      if (filled.length === 0) {
+        list.innerHTML = '<div class="no-data" style="padding:30px; text-align:center; color:#aaa;">Belum ada data yang diisi.<br>Silakan isi data di tab Input Data.</div>';
+      } else {
+        list.innerHTML = ranked.filter(r => r.hasData).map((r, i) => {
+          const st = getStatusColor(r.total, r.hasData);
+          const numClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-other';
+          const pct = Math.round((r.total / 100) * 100);
+          return `<div class="rank-item">
+        <div class="rank-num ${numClass}">${i + 1}</div>
         <div style="flex:1">
           <div class="rank-nama">${r.nama}</div>
-          <div class="rank-detail">👥 ${parseInt(r.followers||0).toLocaleString('id-ID')} pengikut &nbsp;|&nbsp; 📝 ${r.freq||0}x/mgg &nbsp;|&nbsp; <span style="color:${st.text}">${st.label}</span></div>
+          <div class="rank-detail">👥 ${parseInt(r.followers || 0).toLocaleString('id-ID')} pengikut &nbsp;|&nbsp; 📝 ${r.freq || 0}x/mgg &nbsp;|&nbsp; <span style="color:${st.text}">${st.label}</span></div>
           <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
         </div>
         <div class="rank-score">${r.total}</div>
       </div>`;
-    }).join('');
-  }
-
-  // Bar chart top 15
-  const top15 = ranked.filter(r => r.hasData).slice(0, 15);
-  const labels = top15.map(r => r.nama.length > 20 ? r.nama.slice(0, 20) + '…' : r.nama);
-  const scores = top15.map(r => r.total);
-  const colors = scores.map(s => s >= 70 ? '#2e7d32' : s >= 50 ? '#1565c0' : s >= 30 ? '#f57f17' : '#c62828');
-
-  if (rankChartInst) rankChartInst.destroy();
-  rankChartInst = new Chart(document.getElementById('rankChart'), {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'Skor Gabungan',
-        data: scores,
-        backgroundColor: top15.length ? colors : ['#eee'],
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { min: 0, max: 100, ticks: { font: { size: 11 } } },
-        y: { ticks: { font: { size: 11 } } }
+        }).join('');
       }
+
+      // Bar chart top 15
+      const top15 = ranked.filter(r => r.hasData).slice(0, 15);
+      const labels = top15.map(r => r.nama.length > 20 ? r.nama.slice(0, 20) + '…' : r.nama);
+      const scores = top15.map(r => r.total);
+      const colors = scores.map(s => s >= 70 ? '#2e7d32' : s >= 50 ? '#1565c0' : s >= 30 ? '#f57f17' : '#c62828');
+
+      if (rankChartInst) rankChartInst.destroy();
+      rankChartInst = new Chart(document.getElementById('rankChart'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Skor Gabungan',
+            data: scores,
+            backgroundColor: top15.length ? colors : ['#eee'],
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { min: 0, max: 100, ticks: { font: { size: 11 } } },
+            y: { ticks: { font: { size: 11 } } }
+          }
+        }
+      });
+
+      // Category chart
+      const cats = ['Dinas', 'Kecamatan', 'Bagian'];
+      const catColors = ['#1877F2', '#42a5f5', '#90caf9'];
+      const catData = cats.map(cat => {
+        const items = filled.filter(r => r.cat === cat);
+        return items.reduce((s, r) => s + (parseInt(r.followers) || 0), 0);
+      });
+
+      if (catChartInst) catChartInst.destroy();
+      catChartInst = new Chart(document.getElementById('catChart'), {
+        type: 'doughnut',
+        data: {
+          labels: cats,
+          datasets: [{ data: catData, backgroundColor: catColors }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: true, position: 'bottom', labels: { font: { size: 12 }, padding: 16 } } }
+        }
+      });
     }
-  });
 
-  // Category chart
-  const cats = ['Dinas', 'Kecamatan', 'Bagian'];
-  const catColors = ['#1877F2', '#42a5f5', '#90caf9'];
-  const catData = cats.map(cat => {
-    const items = filled.filter(r => r.cat === cat);
-    return items.reduce((s,r) => s + (parseInt(r.followers)||0), 0);
-  });
-
-  if (catChartInst) catChartInst.destroy();
-  catChartInst = new Chart(document.getElementById('catChart'), {
-    type: 'doughnut',
-    data: {
-      labels: cats,
-      datasets: [{ data: catData, backgroundColor: catColors }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: true, position: 'bottom', labels: { font: { size: 12 }, padding: 16 } } }
+    function showTab(name) {
+      document.querySelectorAll('.tab').forEach((t, i) => {
+        const names = ['input', 'ranking', 'panduan'];
+        t.classList.toggle('active', names[i] === name);
+      });
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('panel-' + name).classList.add('active');
+      if (name === 'ranking') renderRanking();
     }
-  });
-}
 
-function showTab(name) {
-  document.querySelectorAll('.tab').forEach((t,i) => {
-    const names = ['input','ranking','panduan'];
-    t.classList.toggle('active', names[i] === name);
-  });
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('panel-' + name).classList.add('active');
-  if (name === 'ranking') renderRanking();
-}
-
-loadData();
-document.getElementById('last-update').textContent = localStorage.getItem('minsel_fb_updated') || 'Belum pernah disimpan';
-renderTable();
-</script>
+    loadData();
+    document.getElementById('last-update').textContent = localStorage.getItem('minsel_fb_updated') || 'Belum pernah disimpan';
+    renderTable();
+  </script>
 </body>
+
 </html>
